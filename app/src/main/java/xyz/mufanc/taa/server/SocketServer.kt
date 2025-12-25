@@ -3,7 +3,6 @@ package xyz.mufanc.taa.server
 import android.net.LocalServerSocket
 import android.net.LocalSocket
 import com.alibaba.fastjson2.into
-import com.alibaba.fastjson2.parseArray
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -15,7 +14,7 @@ import xyz.mufanc.taa.input.TouchAction
 import xyz.mufanc.taa.misc.Log
 import java.io.IOException
 
-class TouchServer {
+class SocketServer {
 
     companion object {
         private const val TAG = "TouchServer"
