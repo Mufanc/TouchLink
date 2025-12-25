@@ -1,6 +1,8 @@
 package xyz.mufanc.taa
 
 import kotlinx.coroutines.runBlocking
+import xyz.mufanc.taa.misc.Log
+import xyz.mufanc.taa.server.TouchServer
 
 object Main {
 
@@ -9,7 +11,7 @@ object Main {
     @JvmStatic
     fun main(args: Array<String>) {
         Thread.setDefaultUncaughtExceptionHandler { th, err ->
-            LogProxy.e(TAG, "Uncaught exception on thread: $th", err)
+            Log.e(TAG, "Uncaught exception on thread: $th", err)
         }
 
         runBlocking {

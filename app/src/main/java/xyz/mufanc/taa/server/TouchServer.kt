@@ -1,8 +1,18 @@
-package xyz.mufanc.taa
+package xyz.mufanc.taa.server
 
 import android.net.LocalServerSocket
 import android.net.LocalSocket
-import kotlinx.coroutines.*
+import com.alibaba.fastjson2.into
+import com.alibaba.fastjson2.parseArray
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import xyz.mufanc.taa.input.InputDispatcher
+import xyz.mufanc.taa.input.TouchAction
+import xyz.mufanc.taa.misc.Log
 import java.io.IOException
 
 class TouchServer {
@@ -13,7 +23,7 @@ class TouchServer {
 
     private lateinit var socket: LocalServerSocket
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-    
+
     @Volatile
     private var running = false
 
@@ -23,7 +33,7 @@ class TouchServer {
 
         withContext(Dispatchers.IO) {
             try {
-                LogProxy.d(TAG, "server is running...")
+                Log.d(TAG, "server is running...")
 
                 while (running) {
                     try {
@@ -34,7 +44,7 @@ class TouchServer {
                         }
                     } catch (err: IOException) {
                         if (running) {
-                            LogProxy.e(TAG, "failed to accept", err)
+                            Log.e(TAG, "failed to accept", err)
                         }
                         break
                     }
@@ -49,15 +59,18 @@ class TouchServer {
         try {
             val peer = socket.peerCredentials
 
-            LogProxy.d(TAG, "handle client: uid=${peer.uid}, pid=${peer.pid}")
+            Log.d(TAG, "handle client: uid=${peer.uid}, pid=${peer.pid}")
 
             socket.use { client ->
                 val data = client.inputStream.use { it.readBytes().decodeToString() }
+                val actions = data.into<List<TouchAction>>().map { it.downcast() }
 
-                LogProxy.d(TAG, "data: ${data.trim()}")
+                Log.d(TAG, "actions: $actions")
+
+                InputDispatcher.dispatchActions(actions)
             }
         } catch (err: IOException) {
-            LogProxy.e(TAG, "failed to handle client", err)
+            Log.e(TAG, "failed to handle client", err)
         }
     }
 
@@ -67,7 +80,7 @@ class TouchServer {
         try {
             socket.close()
         } catch (err: IOException) {
-            LogProxy.e(TAG, "failed to close socket", err)
+            Log.e(TAG, "failed to close socket", err)
         }
 
         scope.cancel()
@@ -77,7 +90,7 @@ class TouchServer {
         try {
             socket.close()
         } catch (err: IOException) {
-            LogProxy.e(TAG, "failed to close socket", err)
+            Log.e(TAG, "failed to close socket", err)
         }
     }
 }

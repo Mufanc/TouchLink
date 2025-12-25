@@ -45,10 +45,12 @@ kotlin {
 }
 
 dependencies {
+    compileOnly(project(":hiddenapi"))
     implementation(libs.core.ktx)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.hiddenapi.runtime)
+    implementation(libs.fastjson.kotlin)
 }
 
 tasks.register("deployRelease") {

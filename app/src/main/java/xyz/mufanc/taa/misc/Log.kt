@@ -1,8 +1,8 @@
-package xyz.mufanc.taa
+package xyz.mufanc.taa.misc
 
 import android.util.Log
 
-object LogProxy {
+object Log {
 
     fun d(tag: String, message: String) {
         println("[$tag] $message")

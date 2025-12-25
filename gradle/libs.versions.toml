@@ -4,6 +4,7 @@ kotlin = "2.3.0"
 core-ktx = "1.17.0"
 hiddenapi-refine = "4.4.0"
 kotlinx-coroutines = "1.10.2"
+fastjson2 = "2.0.60"
 
 [libraries]
 core-ktx = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
@@ -12,6 +13,7 @@ kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutine
 hiddenapi-processor = { module = "dev.rikka.tools.refine:annotation-processor", version.ref = "hiddenapi-refine" }
 hiddenapi-annotation = { module = "dev.rikka.tools.refine:annotation", version.ref = "hiddenapi-refine" }
 hiddenapi-runtime = { module = "dev.rikka.tools.refine:runtime", version.ref = "hiddenapi-refine" }
+fastjson-kotlin = { module = "com.alibaba.fastjson2:fastjson2-kotlin", version.ref = "fastjson2" }
 
 [plugins]
 agp-app = { id = "com.android.application", version.ref = "agp" }
