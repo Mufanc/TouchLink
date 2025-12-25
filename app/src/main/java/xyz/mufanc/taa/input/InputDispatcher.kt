@@ -22,8 +22,9 @@ object InputDispatcher {
         check()
 
         val id = TouchSimulator.down(action.point.x, action.point.y)
+        val ts = SystemClock.uptimeMillis()
 
-        handler.postDelayed(action.duration) {
+        handler.postAtTime(ts + action.duration) {
             TouchSimulator.up(id, action.point.x, action.point.y)
         }
     }
@@ -100,6 +101,7 @@ object InputDispatcher {
     }
 
     fun dispatchActions(actions: List<TouchAction>) {
+        // Todo: 这里加个等待，任务排队
         actions.forEach { action ->
             handler.postDelayed(action.delay) {
                 when (action) {
