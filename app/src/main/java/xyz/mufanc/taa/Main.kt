@@ -1,78 +1,44 @@
 package xyz.mufanc.taa
 
-import kotlinx.coroutines.runBlocking
-import picocli.CommandLine
-import picocli.CommandLine.Command
-import picocli.CommandLine.Option
+import xyz.mufanc.taa.actions.ActionResult
+import xyz.mufanc.taa.actions.impl.TouchLinkAction
+import xyz.mufanc.taa.misc.JsonCompat
 import xyz.mufanc.taa.misc.Log
-import xyz.mufanc.taa.server.SocketServer
-import xyz.mufanc.taa.server.StdioServer
-import java.util.concurrent.Callable
-import kotlin.system.exitProcess
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
-@Command(name = "touchlink")
-class Main : Callable<Int> {
+object Main {
 
-    companion object {
-        private const val TAG = "TouchLink"
+    private const val TAG = "Main"
 
-        @JvmStatic
-        fun main(args: Array<String>) {
-            Thread.setDefaultUncaughtExceptionHandler { th, err ->
-                Log.e(TAG, "Uncaught exception on thread: $th", err)
+    @JvmStatic
+    fun main(args: Array<String>) {
+        Thread.setDefaultUncaughtExceptionHandler { th, err ->
+            Log.e(TAG, "Uncaught exception on thread: $th", err)
+        }
+
+        val reader = BufferedReader(InputStreamReader(System.`in`))
+
+        while (true) {
+            val line = reader.readLine() ?: break
+
+            if (line.isBlank()) {
+                continue
             }
-
-            val code = CommandLine(Main()).execute(*args)
-            exitProcess(code)
-        }
-    }
-
-    @Option(
-        names = ["-m", "--mode"],
-        description = ["Communication mode: socket or stdio (default: stdio)"],
-        defaultValue = "stdio",
-        converter = [ModeConverter::class]
-    )
-    lateinit var mode: Mode
-
-    override fun call(): Int {
-        when (mode) {
-            Mode.STDIO -> runStdio()
-            Mode.SOCKET -> runSocket()
-        }
-
-        return 0
-    }
-
-    private fun runStdio() {
-        val server = StdioServer()
-
-        try {
-            server.serve()
-        } finally {
-            server.stop()
-        }
-    }
-
-    private fun runSocket() {
-        runBlocking {
-            val server = SocketServer()
 
             try {
-                server.serve()
-            } finally {
-                server.stop()
+                val action: TouchLinkAction? = JsonCompat.fromJson(line.trim())
+
+                if (action == null) {
+                    println(ActionResult.failed("failed to parse command"))
+                    continue
+                }
+
+                println(action.run())
+            } catch (err: Throwable) {
+                Log.e(TAG, "unknown error", err)
+                println(ActionResult.failed(err.message))
             }
-        }
-    }
-
-    enum class Mode {
-        STDIO, SOCKET
-    }
-
-    class ModeConverter : CommandLine.ITypeConverter<Mode> {
-        override fun convert(value: String): Mode {
-            return Mode.valueOf(value.uppercase())
         }
     }
 }

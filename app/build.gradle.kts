@@ -50,8 +50,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.hiddenapi.runtime)
-    implementation(libs.fastjson.kotlin)
-    implementation(libs.picocli)
+    implementation(libs.moshi.kotlin)
 }
 
 tasks.register("deployRelease") {
