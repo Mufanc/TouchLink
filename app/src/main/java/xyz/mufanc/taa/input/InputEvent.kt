@@ -9,6 +9,7 @@ class InputEvent : Serializable {
     var delay: Long = 0
     var duration: Long = 0
     var args: List<Int> = emptyList()
+    var extras: Map<String, Int> = emptyMap()
 
     fun downcast(): Action? {
         return when (action) {
@@ -22,7 +23,7 @@ class InputEvent : Serializable {
                     points.add(Point(args[i], args[i + 1]))
                 }
 
-                Action.Swipe(points)
+                Action.Swipe(points, extras["stabilize"]?.toLong() ?: 0)
             }
             else -> null
         }
@@ -45,6 +46,7 @@ class InputEvent : Serializable {
 
         data class Swipe(
             val points: List<Point>,
+            val stabilize: Long,
             override val delay: Long = 0,
             override val duration: Long = 0
         ) : Action()

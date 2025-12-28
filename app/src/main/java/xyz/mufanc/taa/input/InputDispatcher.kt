@@ -1,5 +1,6 @@
 package xyz.mufanc.taa.input
 
+import android.annotation.SuppressLint
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.MessageQueue
@@ -42,6 +43,7 @@ object InputDispatcher {
 
     private class Worker : HandlerThread("taa-dispatcher") {
 
+        @SuppressLint("DiscouragedPrivateApi")
         companion object {
 
             private const val SWIPE_EVENT_PERIOD_MILLIS = 1000f / 60f  // 60Hz
@@ -130,7 +132,16 @@ object InputDispatcher {
 
             handler.postAtTime(ts + duration) {
                 val point = action.points.last()
-                TouchSimulator.up(id, point.x, point.y)
+
+                TouchSimulator.move(id, point.x, point.y)
+
+                if (action.stabilize == 0L) {
+                    TouchSimulator.up(id, point.x, point.y)
+                } else {
+                    handler.postDelayed(action.stabilize) {
+                        TouchSimulator.up(id, point.x, point.y)
+                    }
+                }
             }
         }
 
