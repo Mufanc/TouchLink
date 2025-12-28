@@ -26,9 +26,14 @@ object TouchSimulator {
     private var downTime = 0L
     private val pointers = LinkedHashMap<Int, Point>()
     private var next = 0
+    private val recycled = mutableSetOf<Int>()
 
     fun down(x: Int, y: Int): Int {
-        val id = next++
+        val id = if (recycled.isNotEmpty()) {
+            recycled.first().also { recycled.remove(it) }
+        } else {
+            next++
+        }
 
         pointers[id] = Point(x, y)
 
@@ -72,6 +77,7 @@ object TouchSimulator {
 
         dispatchEvent(ts, action)
         pointers.remove(id)
+        recycled.add(id)
     }
 
     private fun getInputDeviceId(): Int {
@@ -125,6 +131,7 @@ object TouchSimulator {
         (event as? MotionEvent)?.recycle()
     }
 
+    @Suppress("unused")
     enum class Mode(val code: Int) {
         NONE(0),
         WAIT_FOR_RESULT(1),
